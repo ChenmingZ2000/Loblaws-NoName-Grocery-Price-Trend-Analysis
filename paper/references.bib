@@ -9,8 +9,15 @@
     url = {https://www.R-project.org/},
   }
   
+@Manual{dplyr,
+    title = {{dplyr: A Grammar of Data Manipulation}},
+    author = {Hadley Wickham and Romain François and Lionel Henry and Kirill Müller and Davis Vaughan},
+    year = {2023},
+    note = {R package version 1.1.4, https://github.com/tidyverse/dplyr},
+    url = {https://dplyr.tidyverse.org},
+  }
   
-@Article{thereferencecanbewhatever,
+@Article{tidyverse,
     title = {Welcome to the {tidyverse}},
     author = {Hadley Wickham and Mara Averick and Jennifer Bryan and Winston Chang and Lucy D'Agostino McGowan and Romain François and Garrett Grolemund and Alex Hayes and Lionel Henry and Jim Hester and Max Kuhn and Thomas Lin Pedersen and Evan Miller and Stephan Milton Bache and Kirill Müller and Jeroen Ooms and David Robinson and Dana Paige Seidel and Vitalie Spinu and Kohske Takahashi and Davis Vaughan and Claus Wilke and Kara Woo and Hiroaki Yutani},
     year = {2019},
@@ -19,28 +26,42 @@
     number = {43},
     pages = {1686},
     doi = {10.21105/joss.01686},
-  }  
-  
-  
-@Manual{citeLahman,
-    title = {{Lahman: Sean `Lahman' Baseball Database}},
-    author = {Michael Friendly and Chris Dalzell and Martin Monkman and Dennis Murphy},
-    year = {2020},
-    note = {R package version 8.0-0},
-    url = {https://CRAN.R-project.org/package=Lahman},
-  }  
-  
-  
-@article{gebru2021datasheets,
-  title={Datasheets for datasets},
-  author={Gebru, Timnit and Morgenstern, Jamie and Vecchione, Briana and Vaughan, Jennifer Wortman and Wallach, Hanna and Iii, Hal Daum{\'e} and Crawford, Kate},
-  journal={Communications of the ACM},
-  volume={64},
-  number={12},
-  pages={86--92},
-  year={2021},
-  publisher={ACM New York, NY, USA}
+  }
+
+@Manual{knitr,
+  title = {{knitr: A General-Purpose Package for Dynamic Report Generation in R}},
+  author = {Yihui Xie},
+  year = {2023},
+  note = {R package version 1.40.1},
+  url = {https://cran.r-project.org/web/packages/knitr/index.html},
 }
+
+@Book{ggplot2,
+    author = {Hadley Wickham},
+    title = {{ggplot2: Elegant Graphics for Data Analysis}},
+    publisher = {Springer-Verlag New York},
+    year = {2016},
+    isbn = {978-3-319-24277-4},
+    url = {https://ggplot2.tidyverse.org},
+  }
+
+@Manual{kableExtra,
+    title = {{kableExtra: Construct Complex Table with 'kable' and Pipe Syntax}},
+    author = {Hao Zhu},
+    year = {2024},
+    note = {R package version 1.4.0, 
+https://github.com/haozhu233/kableExtra},
+    url = {http://haozhu233.github.io/kableExtra/},
+  }
+  
+@Manual{patch,
+    title = {{patchwork: The Composer of Plots}},
+    author = {Thomas Lin Pedersen},
+    year = {2024},
+    note = {R package version 1.3.0, 
+https://github.com/thomasp85/patchwork},
+    url = {https://patchwork.data-imaginist.com},
+  }
 
 @Misc{rstanarm,
     title = {{rstanarm: {Bayesian} applied regression modeling via {Stan}}},
@@ -50,15 +71,32 @@
     url = {https://mc-stan.org/rstanarm/},
   }
   
-@Manual{palmerpenguins,
-    title = {{palmerpenguins: Palmer Archipelago (Antarctica) penguin data}},
-    author = {Allison Marie Horst and Alison Presmanes Hill and Kristen B Gorman},
-    year = {2020},
-    note = {R package version 0.1.0},
-    doi = {10.5281/zenodo.3960218},
-    url = {https://allisonhorst.github.io/palmerpenguins/},
+@Manual{bayesplot,
+    title = {bayesplot: Plotting for Bayesian Models.},
+    author = {Gabry J, Mahr T},
+    year = {2024},
+    note = {R package version 1.11.1},
+    url = {https://mc-stan.org/bayesplot/},
+  }
+
+
+@Manual{arrow,
+    title = {{arrow: Integration to 'Apache' 'Arrow'}},
+    author = {Neal Richardson and Ian Cook and Nic Crane and Dewey Dunnington and Romain François and Jonathan Keane and Dragoș Moldovan-Grünfeld and Jeroen Ooms and Jacob Wujciak-Jens and {Apache Arrow}},
+    year = {2024},
+    note = {R package version 17.0.0.1, https://arrow.apache.org/docs/r/},
+    url = {https://github.com/apache/arrow/},
   }
   
+  
+@Website{rohan,
+    title = {Starter Folder},
+    author = {Rohan Alexander},
+    year = {2024},
+    website = {Github},
+    url = {https://github.com/RohanAlexander/starter_folder.git},
+    accessed = {2024 October 23}
+  }    
   
 @book{tellingstories,
     title = {Telling Stories with Data},
@@ -68,12 +106,40 @@
     url = {https://tellingstorieswithdata.com/}
   }  
   
-  
+@misc{hammer,
+  author       = {Jacob Filipp},
+  title        = {Hammer Canadian Grocery Price Data},
+  year         = {2024},
+  howpublished = {https://jacobfilipp.com/hammer/},
+  note         = {Accessed: 20 November 2024}
+}
 
-@Manual{shelter,
-    title = {Deaths of Shelter Residents},
-    author = {{Toronto Shelter & Support Services}},
-    year = {2024},
-    note = {As accessed 2024-10-02.},
-    url = {https://open.toronto.ca/dataset/deaths-of-shelter-residents/},
-  }  
+@misc{loblaw2022,
+  author       = {Loblaw Companies Limited},
+  title        = {Loblaw hits the brakes on food inflation by freezing prices on 1,500 No Name products},
+  year         = {2022},
+  howpublished = {\url{https://www.loblaw.ca/en/loblaw-hits-the-brakes-on-food-inflation-by-freezing-prices-on-1500-no-name-products/}},
+  note         = {Accessed: 21 November 2024}
+} 
+
+@misc{gamma_2018,
+  author       = {Xin Chen and Aleksandr Y. Aravkin and R. Douglas Martin},
+  title        = {Generalized Linear Model for Gamma Distributed Variables via Elastic Net Regularization},
+  year         = {2018},
+  eprint       = {1804.07780},
+  archivePrefix= {arXiv},
+  primaryClass = {stat},
+  url          = {https://arxiv.org/pdf/1804.07780}
+}
+
+@article{Veazie2023GammaModel,
+  author    = {Peter Veazie and Orna Intrator and Bruce Kinosian and Ciaran S. Phibbs },
+  title     = {Better performance for right-skewed data using an alternative gamma model},
+  journal   = {BMC Medical Research Methodology},
+  volume    = {23},
+  number    = {298},
+  year      = {2023},
+  doi       = {10.1186/s12874-023-02113-1},
+  url       = {https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-023-02113-1}
+}
+

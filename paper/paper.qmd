@@ -230,33 +230,68 @@ p3 + p4
 ```
 
 
-# Model
+# Model {#sec-model}
+Our model references the analytical approach proposed by @gamma_2018, adopting a hierarchical Bayesian framework to model the price trends of Loblaws' "No Name" grocery products. Specifically, the model is based on a Gamma regression framework with a log-link function, designed to handle the positively skewed distribution of product prices. By using the Gamma distribution, we can capture the inherent variability in prices while adhering to the non-negative nature of price data. The Gamma distribution is particularly well-suited for modeling continuous, non-negative, and positively right-skewed data, which are common in economic contexts such as insurance claims and survival data [@gamma_2018].
 
-The goal of our modelling strategy is twofold. Firstly,...
+The goal of our modeling strategy is to build a pricing model aimed at predicting changes in `current_price` over time while considering key variables that influence price fluctuations. The structure of the model combines fixed effects and random effects and includes multiple variables, such as `product_id`, product `size`, and product `type`. This modeling approach is designed to balance the complexity of the data while ensuring robust predictions. The hierarchical structure of the model allows us to capture variations at the level of individual products while identifying overall trends across different product sizes and types. It also enables us to forecast future price trends of Loblaws "No Name" groceries, observing whether the retailer's pricing behavior aligns with their commitments.
 
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
+Here, we provide a brief overview of the Bayesian analytical model used to investigate the price trends of Loblaws "No Name" products. Background details, model assumptions, and diagnostics are included in [Appendix -@sec-model-details].
 
 ## Model set-up
 
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
+This model is a generalized linear mixed model (GLMM) within a Bayesian framework, specifically designed to handle positively skewed data:
 
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
+$y_i \sim \text{Gamma}(\mu_i, \phi)$
 
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
+Define yiy_i as the current price of the product in the ii-th observation, assumed to follow a Gamma distribution with mean $\mu_i$ and shape parameter $\phi$. This model accounts for variations across different product sizes, types, and temporal trends, with random intercepts for each product ID.
+
+The linear predictor for the mean ($\mu_i$) of the Gamma distribution is defined as follows:
+$$
+\log(\mu_i) = \alpha + \beta_1 \cdot \text{size}_ i + \beta_2 \cdot \text{type}_i + \beta_3 \cdot \text{date}_i + u_{\text{product_id}[i]} \\
+$$
+
+where:
+$y_i$ is the observed current price for the ii-th product.
+$\mu_i$ is the predicted mean price for the ii-th product, modeled on a log scale.
+$\alpha \sim \text{Normal}(2, 5)$ is the global intercept representing the baseline price.
+$\beta_1 \sim \text{Normal}(0, 5)$ captures the effect of product size on pricing (e.g., Small, Large, Extra Large).
+$\beta_2 \sim \text{Normal}(0, 5)$ represents the effect of product type (e.g., Snacks, Flour/Rice, Cooking Oil) on pricing.
+$\beta_3 \sim \text{Normal}(0, 5)$ accounts for the temporal trend in prices over time.
+
+Random effects:
+
+$u_{\text{state}} \sim \text{Normal}(0, \sigma_{\text{state}})$
+
+$v_{\text{pollster}} \sim \text{Normal}(0, \sigma_{\text{pollster}})$
+
+$\gamma_{\text{pollster}} \sim \text{Normal}(0, \sigma_{\mathrm{pollster\_slope}})$
+
+where:
+
+- $u_{\text{state}[i]}$ is the random intercept for each state, allowing for state-level variations in Trump support.
+- $v_{\text{pollster}[i]}$ is the random intercept for each pollster, capturing pollster-specific effects.
+- $\gamma_{\text{pollster}[i]}$ is the random slope associated with the time variable ($\mathrm{days\_since\_Biden\_Withdrawal}$) for each pollster.
 
 
-### Model justification
+## Model justification
+### Model Prior Selection, Assumptions, and Validation
+Our prior selection was informed by the research in gamma modeling @Veazie2023GammaModel, we aim to provide sufficient flexibility for the model to adapt to the data. For example, the prior for the intercept was set as $\text{Normal}(2, 5)$, reflecting the assumption that the baseline log-transformed price of Loblaws "No Name" products fluctuates around 2 while allowing for some uncertainty. For the effect coefficients of variables such as size, type, and date, we chose priors of $\text{Normal}(0, 5)$, representing the expectation of moderate impacts of these variables on pricing. These priors enable the model to adjust based on observed data.
 
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
+The model assumes that price variations at the product level are non-negative, right-skewed, and that the price differences associated with size and type are random and normally distributed. While these assumptions simplify computation and enhance interpretability, they may not fully capture the impact of market conditions, regional competition, or seasonal trends on pricing dynamics. For instance, the model assumes that the effect of size is consistent across all product types, but in reality, certain product types may be more significantly influenced by supply chain issues or promotional activities. Additionally, the model incorporates random effects for individual products to capture specific variations for each product, assuming these effects remain consistent over time.
 
-We can use maths by including latex between dollar signs, for instance $\theta$.
+- **TODO**
+
+### Expectation of relationships between variables
+
+For the variable `type`, we anticipate that different product types will influence the estimation of current prices. While we cannot precisely determine which product categories incur higher costs due to supply chain or consumer demand, it is reasonable to assume that categories such as "Snacks" or "Flour/Rice" may exhibit distinct pricing dynamics. For instance, "Snacks" might experience greater price volatility due to internet trends or elastic demand, whereas "Flour/Rice" could reflect a more stable trend. These category-specific variables introduce variability into the overall pricing estimates.
+
+For the variable `date`, we hypothesize that the prices of Loblaws "No Name" products fluctuate over time, reflecting seasonal trends, market dynamics, and promotional activities. This hypothesis is based on historical observations, where prices often vary due to promotions or stock-outs. Long-term trends, on the other hand, may reflect broader economic conditions or changes in production costs.
+The variable size captures the impact of product quantity on pricing. We expect larger-sized products, such as "Extra Large," to generally have higher prices due to increased quantities. However, economies of scale may result in lower unit prices for larger sizes, while smaller sizes, despite lower overall costs, may have higher unit prices. This pricing strategy is common in retail to ensure accessibility for different consumer groups while optimizing profit margins.
+
+To account for variations among individual products, we introduced a random intercept `(1 | product_id)` for each product. This intercept captures product-specific price differences, such as brand effects, unique demand characteristics, or production costs.
+
+By modeling the interaction between size and type `(size * type)`, the model allows for a more detailed understanding of relationships, such as pricing differences for "Extra Large" products between "Cooking Oil" and "Milk." This interaction term helps identify combined effects that cannot be fully explained by individual variables. Together, these variables enable the model to capture the dynamic pricing structure of Loblaws "No Name" products, reflecting time trends and structural differences across product categories and sizes.
+
 
 
 # Results
