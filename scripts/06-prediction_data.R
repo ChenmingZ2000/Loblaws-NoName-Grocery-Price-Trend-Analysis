@@ -5,9 +5,9 @@
 # Contact: chenming.zhao@mail.utoronto.ca
 # License: MIT
 # Pre-requisites:
-#   - Ensure the gamma model is saved at "models/gamma_model.rds".
+#   - Ensure the gamma model is saved at "models/price_model.rds".
 #   - Load the Excel file with product details.
-#   - Install the necessary libraries: `tidyverse`, `arrow`.
+#   - Install the necessary libraries: `tidyverse`, `arrow`, `rstanarm`, `brms`.
 
 
 #### Workspace setup ####
