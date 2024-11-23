@@ -1,16 +1,19 @@
 ---
-title: "My title"
-subtitle: "My subtitle if needed"
+title: "Title"
+subtitle: "Subtitle"
 author: 
-  - First author
-  - Another author
-thanks: "Code and data are available at: [https://github.com/RohanAlexander/starter_folder](https://github.com/RohanAlexander/starter_folder)."
+  - Chenming Zhao
+thanks: "Code and data are available at: [https://github.com/ChenmingZ2000/Loblaws-NoNameBrand-Grocery-Price-Trend-Analysis.git](https://github.com/ChenmingZ2000/Loblaws-NoNameBrand-Grocery-Price-Trend-Analysis.git).
+        We gratefully acknowledge Jacob Filipp’s groceries dataset used in this analysis. The data is available at: [https://jacobfilipp.com/hammer/](https://jacobfilipp.com/hammer/).
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "abstract"
 format: pdf
 number-sections: true
 bibliography: references.bib
+header-includes:
+  - \usepackage{paper/tabularray}
+pdf-engine: lualatex
 ---
 
 ```{r}
@@ -19,7 +22,13 @@ bibliography: references.bib
 #| message: false
 
 library(tidyverse)
-library(palmerpenguins)
+library(dplyr)
+library(knitr)
+library(ggplot2)
+library(kableExtra)
+library(bayesplot)
+library(patchwork)
+library(arrow)
 ```
 
 
@@ -36,78 +45,189 @@ Why it matters paragraph
 Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
 
 
-
-
-
-
 # Data {#sec-data}
 
 ## Overview
 
-We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
+The product pricing data for the "No Name" brand sold by Loblaws, used in this analysis, is included in the dataset provided by [@hammer], sourced from [https://jacobfilipp.com/hammer/](https://jacobfilipp.com/hammer/). This dataset compiles detailed product information, including vendors, product names, brands, categories, and unit prices. Additionally, it includes time-series pricing records for each product, capturing timestamps of price changes, current prices, unit prices, and quantities sold. These records are periodically updated on the Hammer platform to reflect the latest pricing trends. This dataset forms the foundation for analyzing price trends, identifying unit variations, and categorizing products into specific types for further analysis. Table @tbl-productdata previews the information for the target products included in this analysis, starting from June 2024.
 
-Overview text
+To simulate, test, analyze, and clean the polling data, the statistical programming language R was employed [@citeR]. Key libraries that supported the data analysis include `tidyverse` [@tidyverse], `readxl` [@readxl], `dplyr` [@dplyr], `arrow` [@arrow], `knitr` [@knitr], `ggplot2` [@ggplot2], `kableExtra` [@kableExtra] and `patchwork` [@patch]. Additionally, the `rstanarm` [@rstanarm] library was utilized to implement multilevel modeling for prediction purposes. Also this analysis inherits the folder structure from Professor Rohan Alexander from University of Toronto [@rohan].
 
-## Measurement
-	
-Some paragraphs about how we go from a phenomena in the world to an entry in the dataset.
+In the real world, pricing data for consumer goods is a dynamic reflection of market trends, regional preferences, and competitive strategies. The prices of products fluctuate based on supply chain disruptions, seasonal demand, and retail strategies, making it essential to track and analyze this information systematically. The Hammer dataset serves as a resource in understanding these trends, offering a detailed collection of product pricing data sourced from leading retailers like Loblaws, Walmart, and Metro. This dataset is embedded with complexities arising from the data collection process, competitive pricing strategies, and evolving consumer behavior.
 
-## Outcome variables
+Although the data collection process for [@hammer] data is not explicitly documented, based on the emphasis on "related" content on the Project Hammer website and standard industry methods, it is highly likely that common techniques such as web scraping, API integration, and data standardization were employed. These are typical approaches used to construct structured datasets from online retail platforms. That is, retailers provide public access to their product inventories and prices through their websites, making them prime candidates for automated data extraction. For example, web scraping tools are deployed to extract product details such as names, brands, vendors, categories, unit prices, and quantities, while timestamps capture the exact moment of data retrieval to ensure time-sensitive accuracy. However, even with automated methods, the process is not without its challenges. Retailers often introduce barriers like CAPTCHA systems or dynamic content loading, which require robust solutions such as headless browsers or API integrations to ensure smooth data acquisition.
 
-Add graphs, tables and text. Use sub-sub-headings for each outcome variable or update the subheading to be singular.
+Sampling and representativeness are considerations in Hammer's data collection process. Since the dataset aims to reflect national pricing trends, it includes a diverse range of vendors and product types to capture regional and competitive variations. However, inherent biases may still exist. For instance, not all vendors update their online product catalogs in real time, which may introduce lag in capturing price changes. Additionally, regional pricing disparities might not always align with the dataset's collection schedule, potentially skewing the data toward more actively monitored regions or vendors.
+
+Once the raw data is collected, it undergoes cleaning and standardization. Product names, for instance, often include variations due to marketing strategies (e.g., "Club Size" or "Family Pack"), which are standardized to ensure consistency across entries. Similarly, data with missing values—such as prices or unit information—are flagged for further investigation.
+
+Finally, the cleaned and standardized data is stored in a structured database, organized by product ID, timestamps, and categorical variables such as vendor, brand, and product category. This structured approach allows researchers to track pricing trends over time, analyze variations across regions or vendors, and categorize products into specific types. Hammer's database not only facilitates trend analysis but also enables broader comparisons and aggregations, allowing researchers to examine shifts in consumer behavior or retailer strategies.
+
+## Analysis Data
+
+This analysis focuses on Loblaws' "No Name" brand products, with the goal of understanding pricing trends. We only selected observations where the vendor is Loblaws and the brand is "No Name" because Loblaws announced a price freeze on more than 1,500 "No Name" products until January 31, 2023, to address the pressures of rising food prices. However, with the price freeze period now over in 2024, we are particularly interested in analyzing the price changes of "No Name" products [see more details in @loblaw2022]. At the same time, we prioritized high-quality data by filtering out records with missing or incomplete price information, as we have plenty of price records for a product in one day and unreliable data could introduce significant bias and reduce the accuracy of our trend analysis. In researching price trends and product variations, we selected specific variables that are impactful for analyzing pricing behavior affected by product categorization. Below is an overview of the data used for this analysis @tbl-view, along with the selected outcome and predictor variables.
+
+### Outcome Variables
+
+In this analysis of Loblaws' "No Name" brand products 2024, the primary outcome variable is the `current_price`, which represents the retail price of a product at the time of the record. Understanding the pricing trends of these products allows us to analyze consumer affordability, retailer pricing strategies, and competitive positioning in the market. By focusing on `current_price`, we aim to identify influences that influence price fluctuations over time and assess how product size, unit and type variations contribute to these trends. This metric serves as the foundation for evaluating the dynamics of product pricing and finding differences across product categories.
+
+### Predictor Variables
+In this analysis, the predictor variables are the variables that we believe can influence the current price of products in the Loblaws grocery dataset. These variables are chosen based on their potential to explain variations in product pricing. Below are the predictor variables included in our model, along with an explanation of their significance.
+
+- `Size`: Product size is a determinant of pricing, as larger sizes generally cost more due to the increased quantity. However, pricing strategies such as bulk discounts or price-per-unit variations can create non-linear relationships between size and price, making size an important factor to analyze.
+- `Type`: Product type (e.g., snacks, seasoning, dairy) reflects category-level differences in pricing strategies. Different types of products may have varying production costs, supply chain logistics, and market demand, all of which contribute to price fluctuations.
+- `Date`: Time plays an important role in grocery pricing due to reasons like seasonal demand, inflation, supply chain disruptions, and promotions. Analyzing the impact of time allows us to capture temporal trends and shifts in pricing behavior, such as rising costs during inflationary periods or discounts during specific seasons.
+
+### Exclusions and Considerations
+Other variables (e.g., vendor or brand-specific promotions) could also influence pricing. However, in this analysis, we focus specifically on the effects of `size`, `type`, and `date`, as they represent the most consistent and accessible predictors in the dataset. Additional variables, while potentially relevant, may not be consistently available or may introduce unnecessary complexity into the model.
+For example, promotions or regional pricing differences were not included in this analysis due to large amounts of data unavailability. Additionally, while `old_price` might influence pricing strategies, this dataset does not provide enough details. By focusing on the variables above, we aim to construct a reliable and interpretable model for understanding price dynamics within Loblaws' "No Name" brand products.
 
 
-
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
-
-```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
+```{r, message=FALSE}
 #| echo: false
-
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
-```
-
-Talk more about it.
-
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
-
-```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
-#| echo: false
+#| eval: true
 #| warning: false
 #| message: false
 
-analysis_data <- read_csv(here::here("data/02-analysis_data/analysis_data.csv"))
-
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
+analysis_data <- read_parquet(here::here("data/02-analysis_data/loblaws_data.parquet"))
 ```
 
-Talk way more about it. 
+```{r}
+#| label: tbl-view
+#| tbl-cap: The First Few Lines of Cleaned Grocery Price Analysis Data
+#| echo: false
 
-## Predictor variables
+sorted_data <- analysis_data %>%
+  arrange(date)
 
-Add graphs, tables and text.
+kable(head(sorted_data, 7), 
+      col.names = c("product_id", "date", "current_price", "price_per_unit", "product_name", "units", "type", "size"), 
+      align = c("l", "c", "c", "c", "c", "c", "c", "c")) %>%
+kable_styling(font_size = 7)
+```
 
-Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
+### Relations Between Variables
+
+The following figures, @fig-1 and @fig-2, present various aspects of data related to Loblaws' "No Name" grocery prices, helping us understand how item prices change with different variables. In the left panel of @fig-1 and both panels in @fig-2, the x-axis is marked with dates categorized by month. The chart analyzes the relationships between product prices, size, type, and date, showing how these variables may interact and influence pricing trends. Product size and type have an impact on pricing trends, and we anticipate that incorporating these variables into the predictive model will improve the accuracy of price predictions under different product and market conditions.
+
+While we observe certain significant fluctuations in the right panel of @fig-2, which may indicate abnormal prices being recorded or the presence of products with extreme prices in specific categories during certain periods, we cannot directly remove this data as it still contains information we need. In other words, the prices of these products can also explain some of the reasons behind price fluctuations. Completely removing these observations would weaken the model's ability to reflect price trends accurately. Therefore, we choose to retain these observations and mitigate the biases they introduce by combining other variables to build a more robust predictive model.
+
+The boxplot on the right part of @fig-1, shows the pricing differences across product sizes. Compared to "Small" and "Large" products, "Extra Large" products have a higher median price and a wider interquartile range. This reflects inherent pricing strategies where larger quantities are priced higher, but not always linearly (e.g., discounts for bulk purchases). However, the presence of outliers, especially in the "Extra Large" and "Large" categories, indicates that even within the same size group, different product types or brands can significantly impact final pricing. The narrow boxplot for "Small" products suggests a smaller range of price variation, which aligns with the lack of price fluctuations observed in the left panel of @fig-1 for small-sized products.
+
+The plot @fig-2 shows how average prices vary over time, segmented by product `type` (left) and `size` (right). In the left panel, we observe distinct pricing patterns across product types. For instance, "Seasoning" demonstrates higher volatility compared to "Flour/Rice," likely due to differences in demand elasticity. The "Milk" category shows occasional price dips, possibly influenced by the introduction of new products or promotional events.
+
+The right panel shows price trends segmented by size. "Extra Large" products generally have higher average prices but exhibit more unstable trends over time. In contrast, "Small" products show minimal price variation, possibly due to their inherently lower pricing or because their unit price is relatively higher compared to larger sizes.
 
 
+```{r, message=FALSE, fig.width=8, fig.height=3}
+#| label: fig-1
+#| fig-cap: Price Trend for Six of the Loblaws "No Name" Groceries Over Time (left) and Price Distribution by Size (right).
+#| echo: false
 
+# Plot price trends over time by product_id
+selected_ids <- c("1870038", "1876096", "1871388", "1295620", "1876747", 
+                  "1870410")
 
+filtered_data <- analysis_data %>%
+  filter(product_id %in% selected_ids) %>%
+  mutate(label = paste(product_name, size, sep = ", "))
 
+p1 <- ggplot(filtered_data, aes(x = date, y = current_price, group = product_id, color = label)) +
+  geom_line(alpha = 0.7, size = 1) +
+  labs(x = "Date", 
+       y = "Price of the Day", 
+       title = "Price Trend for Products by Date",
+       subtitle = "Product randomly selected",
+       color = "Product Name and Size") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 5),
+    axis.text.y = element_text(size = 5),
+    plot.title = element_text(size = 7, face = "bold", color = "#333333"),
+    plot.subtitle = element_text(size = 6, color = "#333333"),
+    legend.title = element_text(size = 5, color = "#333333"),
+    legend.text = element_text(size = 5, color = "#333333"),
+    legend.key.size = unit(0.5, "lines"),
+    axis.title = element_text(size = 6, color = "#333333"),
+    strip.text = element_text(size = 5)
+)
 
+p2 <- ggplot(analysis_data, aes(x = size, y = current_price, fill = size)) +
+  geom_boxplot() +
+  labs(x = "Size", y = "Price", title = "Price Distribution by Size")  +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 5),
+    axis.text.y = element_text(size = 5),
+    plot.title = element_text(size = 7, face = "bold", color = "#333333"),
+    plot.subtitle = element_text(size = 6, color = "#333333"),
+    legend.title = element_text(size = 5, color = "#333333"),
+    legend.text = element_text(size = 5, color = "#333333"),
+    legend.key.size = unit(0.5, "lines"),
+    axis.title = element_text(size = 6, color = "#333333"),
+    strip.text = element_text(size = 5)
+)
+
+p1 + p2
+```
+
+```{r, message=FALSE, fig.width= 7, fig.height= 3}
+#| label: fig-2
+#| fig-cap: Average Support Rate  for Donald Trump from 2024-07-21 to 2024-10-23 reported by different pollsters
+#| echo: false
+# Group data by date and product type, and calculate average price for each type per date
+type_trend_data <- analysis_data %>%
+  group_by(date, type) %>%
+  summarise(avg_price = mean(current_price, na.rm = TRUE)) %>%
+  ungroup()
+
+p3 <- ggplot(type_trend_data, aes(x = date, y = avg_price, color = type)) +
+  geom_line(size = 0.7) +
+  labs(
+    x = "Date",
+    y = "Average Price",
+    title = "Price Trend by Time and Product Type",
+    color = "Product Type"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 5),
+    axis.text.y = element_text(size = 5),
+    plot.title = element_text(size = 7, face = "bold", color = "#333333"),
+    plot.subtitle = element_text(size = 6, color = "#333333"),
+    legend.title = element_text(size = 5, color = "#333333"),
+    legend.text = element_text(size = 5, color = "#333333"),
+    legend.key.size = unit(0.5, "lines"),
+    axis.title = element_text(size = 6, color = "#333333"),
+    strip.text = element_text(size = 5)
+)
+
+# Group data by date and product size, and calculate average price for each size per date
+size_trend_data <- analysis_data %>%
+  group_by(date, size) %>%
+  summarise(avg_price = mean(current_price, na.rm = TRUE)) %>%
+  ungroup()
+
+# Plot the trend
+p4 <- ggplot(size_trend_data, aes(x = date, y = avg_price, color = size)) +
+  geom_line(size = 0.7) +
+  labs(
+    x = "Date",
+    y = "Average Price",
+    title = "Price Trend by Time and Product Size",
+    color = "Product Size"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 5),
+    axis.text.y = element_text(size = 5),
+    plot.title = element_text(size = 7, face = "bold", color = "#333333"),
+    plot.subtitle = element_text(size = 6, color = "#333333"),
+    legend.title = element_text(size = 5, color = "#333333"),
+    legend.text = element_text(size = 5, color = "#333333"),
+    legend.key.size = unit(0.5, "lines"),
+    axis.title = element_text(size = 6, color = "#333333"),
+    strip.text = element_text(size = 5)
+)
+
+p3 + p4
+```
 
 
 # Model
