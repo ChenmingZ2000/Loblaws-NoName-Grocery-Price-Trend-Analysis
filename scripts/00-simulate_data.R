@@ -1,52 +1,59 @@
 #### Preamble ####
-# Purpose: Simulates a dataset of Australian electoral divisions, including the 
-  #state and party that won each division.
-# Author: Rohan Alexander
-# Date: 26 September 2024
-# Contact: rohan.alexander@utoronto.ca
+# Purpose: Simulates a dataset of Loblaws "No Name" grocery prices with unique 
+#          product IDs, sizes, types, and dates.
+# Author: Chenming Zhao
+# Date: 20 November 2024
+# Contact: chenming.zhao@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: The `tidyverse` package must be installed
-# Any other information needed? Make sure you are in the `starter_folder` rproj
+# Pre-requisites: The `tidyverse` and `lubridate` packages must be installed.
 
 
 #### Workspace setup ####
 library(tidyverse)
-set.seed(853)
+library(lubridate)
 
 
 #### Simulate data ####
-# State names
-states <- c(
-  "New South Wales",
-  "Victoria",
-  "Queensland",
-  "South Australia",
-  "Western Australia",
-  "Tasmania",
-  "Northern Territory",
-  "Australian Capital Territory"
+set.seed(1234)
+
+# Function to generate random dates
+random_dates <- function() {
+  seq(as.Date("2024-06-11"), as.Date("2024-11-19"), by = "day")
+}
+
+# Generate base data
+base_products <- tibble(
+  product_name = paste("Product", 1:10),  # 10 base products
+  type = sample(c("Type 1", "Type 2", "Type 3"), size = 10, replace = TRUE)
 )
 
-# Political parties
-parties <- c("Labor", "Liberal", "Greens", "National", "Other")
+# Expand data to include sizes and dates
+simulated_data <- base_products %>%
+  crossing(
+    size = c("Small", "Large", "Extra Large"),
+    date = random_dates()
+  ) %>%
+  mutate(
+    # Assign unique numeric product_id based on product_name and size
+    product_id = as.numeric(as.factor(paste(product_name, size))),
+    # Generate prices based on size
+    base_price = case_when(
+      size == "Small" ~ runif(1, min = 2, max = 5),
+      size == "Large" ~ runif(1, min = 5, max = 10),
+      size == "Extra Large" ~ runif(1, min = 8, max = 15)
+    ),
+    # Add random fluctuation to prices
+    current_price = base_price + rnorm(n(), mean = 0, sd = 0.5)
+  ) %>%
+  # Ensure valid prices (non-negative)
+  mutate(
+    current_price = if_else(current_price < 0, 0.01, round(current_price, 2))
+  ) %>%
+  # Randomly drop some "Extra Large" sizes
+  filter(!(size == "Extra Large" & runif(n()) > 0.7))
 
-# Create a dataset by randomly assigning states and parties to divisions
-analysis_data <- tibble(
-  division = paste("Division", 1:151),  # Add "Division" to make it a character
-  state = sample(
-    states,
-    size = 151,
-    replace = TRUE,
-    prob = c(0.25, 0.25, 0.15, 0.1, 0.1, 0.1, 0.025, 0.025) # Rough state population distribution
-  ),
-  party = sample(
-    parties,
-    size = 151,
-    replace = TRUE,
-    prob = c(0.40, 0.40, 0.05, 0.1, 0.05) # Rough party distribution
-  )
-)
+#### Save simulated data ####
+write_csv(simulated_data, "data/00-simulated_data/simulated_grocery_data.csv")
 
-
-#### Save data ####
-write_csv(analysis_data, "data/00-simulated_data/simulated_data.csv")
+#### Preview data ####
+print(simulated_data)
