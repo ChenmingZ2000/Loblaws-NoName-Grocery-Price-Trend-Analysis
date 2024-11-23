@@ -1,89 +1,123 @@
 #### Preamble ####
-# Purpose: Tests the structure and validity of the simulated Australian 
-  #electoral divisions dataset.
-# Author: Rohan Alexander
-# Date: 26 September 2024
-# Contact: rohan.alexander@utoronto.ca
+# Purpose: Tests the structure and validity of the simulated Loblaws grocery dataset
+# Author: Chenming Zhao
+# Date: 20 November 2024
+# Contact: chenming.zhao@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
-  # - The `tidyverse` package must be installed and loaded
-  # - 00-simulate_data.R must have been run
+# - The `tidyverse` package must be installed and loaded
+# - 00-simulate_data.R must have been run
 # Any other information needed? Make sure you are in the `starter_folder` rproj
 
 
 #### Workspace setup ####
 library(tidyverse)
 
-analysis_data <- read_csv("data/00-simulated_data/simulated_data.csv")
+# Load the dataset
+simulated_data <- read_csv("data/00-simulated_data/simulated_grocery_data.csv")
 
 # Test if the data was successfully loaded
-if (exists("analysis_data")) {
+if (exists("simulated_data")) {
   message("Test Passed: The dataset was successfully loaded.")
 } else {
   stop("Test Failed: The dataset could not be loaded.")
 }
 
-
 #### Test data ####
 
-# Check if the dataset has 151 rows
-if (nrow(analysis_data) == 151) {
-  message("Test Passed: The dataset has 151 rows.")
+# Check if the dataset has the correct number of columns
+if (ncol(simulated_data) == 7) {
+  message("Test Passed: The dataset has 7 columns.")
 } else {
-  stop("Test Failed: The dataset does not have 151 rows.")
+  stop("Test Failed: The dataset does not have 6 columns.")
 }
 
-# Check if the dataset has 3 columns
-if (ncol(analysis_data) == 3) {
-  message("Test Passed: The dataset has 3 columns.")
+# Check if all required columns exist
+required_columns <- c("product_id", "date", "current_price", "product_name", "type", "size")
+if (all(required_columns %in% colnames(simulated_data))) {
+  message("Test Passed: All required columns are present.")
 } else {
-  stop("Test Failed: The dataset does not have 3 columns.")
+  stop("Test Failed: Missing one or more required columns.")
 }
 
-# Check if all values in the 'division' column are unique
-if (n_distinct(analysis_data$division) == nrow(analysis_data)) {
-  message("Test Passed: All values in 'division' are unique.")
+# Check if all `date` values are within the valid range
+if (all(as.Date("2024-06-11") <= simulated_data$date & simulated_data$date <= as.Date("2024-11-19"))) {
+  message("Test Passed: All dates are within the valid range.")
 } else {
-  stop("Test Failed: The 'division' column contains duplicate values.")
+  stop("Test Failed: Some dates are outside the valid range.")
 }
 
-# Check if the 'state' column contains only valid Australian state names
-valid_states <- c("New South Wales", "Victoria", "Queensland", "South Australia", 
-                  "Western Australia", "Tasmania", "Northern Territory", 
-                  "Australian Capital Territory")
+# Check if `product_id` is unique for each product-name and size combination
+unique_ids <- simulated_data %>%
+  distinct(product_name, size, product_id) %>%
+  nrow()
 
-if (all(analysis_data$state %in% valid_states)) {
-  message("Test Passed: The 'state' column contains only valid Australian state names.")
+expected_ids <- simulated_data %>%
+  distinct(product_name, size) %>%
+  nrow()
+
+if (unique_ids == expected_ids) {
+  message("Test Passed: `product_id` is unique for each product-name and size combination.")
 } else {
-  stop("Test Failed: The 'state' column contains invalid state names.")
+  stop("Test Failed: `product_id` is not unique for each product-name and size combination.")
 }
 
-# Check if the 'party' column contains only valid party names
-valid_parties <- c("Labor", "Liberal", "Greens", "National", "Other")
-
-if (all(analysis_data$party %in% valid_parties)) {
-  message("Test Passed: The 'party' column contains only valid party names.")
+# Check if `current_price` values are non-negative and reasonable
+if (all(simulated_data$current_price >= 0 & simulated_data$current_price <= 100)) {
+  message("Test Passed: All prices are non-negative and within a reasonable range.")
 } else {
-  stop("Test Failed: The 'party' column contains invalid party names.")
+  stop("Test Failed: Some prices are negative or exceed the reasonable range.")
+}
+
+# Check if there are at least two unique `type` values
+if (n_distinct(simulated_data$type) >= 2) {
+  message("Test Passed: The dataset contains at least two unique product types.")
+} else {
+  stop("Test Failed: The dataset contains less than two unique product types.")
+}
+
+# Check if each product has at least one "Small" size
+small_size_check <- simulated_data %>%
+  filter(size == "Small") %>%
+  distinct(product_name) %>%
+  nrow()
+
+total_products <- simulated_data %>%
+  distinct(product_name) %>%
+  nrow()
+
+if (small_size_check == total_products) {
+  message("Test Passed: Each product has at least one 'Small' size.")
+} else {
+  stop("Test Failed: Some products do not have a 'Small' size.")
 }
 
 # Check if there are any missing values in the dataset
-if (all(!is.na(analysis_data))) {
+if (all(!is.na(simulated_data))) {
   message("Test Passed: The dataset contains no missing values.")
 } else {
   stop("Test Failed: The dataset contains missing values.")
 }
 
-# Check if there are no empty strings in 'division', 'state', and 'party' columns
-if (all(analysis_data$division != "" & analysis_data$state != "" & analysis_data$party != "")) {
-  message("Test Passed: There are no empty strings in 'division', 'state', or 'party'.")
+# Check if the `size` column only contains valid sizes
+valid_sizes <- c("Small", "Large", "Extra Large")
+if (all(simulated_data$size %in% valid_sizes)) {
+  message("Test Passed: The `size` column contains only valid sizes.")
 } else {
-  stop("Test Failed: There are empty strings in one or more columns.")
+  stop("Test Failed: The `size` column contains invalid values.")
 }
 
-# Check if the 'party' column has at least two unique values
-if (n_distinct(analysis_data$party) >= 2) {
-  message("Test Passed: The 'party' column contains at least two unique values.")
+# Check if each product-name has at least two sizes (Small and Large)
+size_count_check <- simulated_data %>%
+  group_by(product_name) %>%
+  summarize(size_count = n_distinct(size)) %>%
+  filter(size_count >= 2) %>%
+  nrow()
+
+if (size_count_check == total_products) {
+  message("Test Passed: Each product has at least two sizes (Small and Large).")
 } else {
-  stop("Test Failed: The 'party' column contains less than two unique values.")
+  stop("Test Failed: Some products do not have at least two sizes.")
 }
+
+#### End of Tests ####
