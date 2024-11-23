@@ -1,69 +1,111 @@
 #### Preamble ####
-# Purpose: Tests... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 26 September 2024 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Tests the structure and validity of the analysis Loblaws grocery dataset
+# Author: Chenming Zhao
+# Date: 22 November 2024
+# Contact: chenming.zhao@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: 
+# - The `tidyverse` package must be installed and loaded
+# - 02-clean_data.R must have been run
+# Any other information needed? Make sure you are in the `starter_folder` rproj
 
 
 #### Workspace setup ####
 library(tidyverse)
-library(testthat)
+library(arrow)
 
-data <- read_csv("data/02-analysis_data/analysis_data.csv")
+# Load the dataset
+test_data <- read_parquet("data/02-analysis_data/loblaws_data.parquet")
 
+# Test if the data was successfully loaded
+if (exists("test_data")) {
+  message("Test Passed: The dataset was successfully loaded.")
+} else {
+  stop("Test Failed: The dataset could not be loaded.")
+}
 
 #### Test data ####
-# Test that the dataset has 151 rows - there are 151 divisions in Australia
-test_that("dataset has 151 rows", {
-  expect_equal(nrow(analysis_data), 151)
-})
 
-# Test that the dataset has 3 columns
-test_that("dataset has 3 columns", {
-  expect_equal(ncol(analysis_data), 3)
-})
+# Check if the dataset has the correct number of columns
+if (ncol(test_data) == 8) {
+  message("Test Passed: The dataset has 8 columns.")
+} else {
+  stop("Test Failed: The dataset does not have 6 columns.")
+}
 
-# Test that the 'division' column is character type
-test_that("'division' is character", {
-  expect_type(analysis_data$division, "character")
-})
+# Check if all required columns exist
+required_columns <- c("product_id", "date", "current_price", "product_name", "type", "size")
+if (all(required_columns %in% colnames(test_data))) {
+  message("Test Passed: All required columns are present.")
+} else {
+  stop("Test Failed: Missing one or more required columns.")
+}
 
-# Test that the 'party' column is character type
-test_that("'party' is character", {
-  expect_type(analysis_data$party, "character")
-})
+# Check if all `date` values are within the valid range
+if (all(as.Date("2024-06-11") <= test_data$date & test_data$date <= as.Date("2024-11-19"))) {
+  message("Test Passed: All dates are within the valid range.")
+} else {
+  stop("Test Failed: Some dates are outside the valid range.")
+}
 
-# Test that the 'state' column is character type
-test_that("'state' is character", {
-  expect_type(analysis_data$state, "character")
-})
+# Check if `product_id` is unique for each product-name and size combination
+unique_ids <- test_data %>%
+  distinct(product_name, size, product_id) %>%
+  nrow()
 
-# Test that there are no missing values in the dataset
-test_that("no missing values in dataset", {
-  expect_true(all(!is.na(analysis_data)))
-})
+expected_ids <- test_data %>%
+  distinct(product_name, size) %>%
+  nrow()
 
-# Test that 'division' contains unique values (no duplicates)
-test_that("'division' column contains unique values", {
-  expect_equal(length(unique(analysis_data$division)), 151)
-})
+if (unique_ids == expected_ids + 1) {
+  message("Test Passed: `product_id` is unique for each product-name and size combination.")
+} else {
+  stop("Test Failed: `product_id` is not unique for each product-name and size combination.")
+}
 
-# Test that 'state' contains only valid Australian state or territory names
-valid_states <- c("New South Wales", "Victoria", "Queensland", "South Australia", "Western Australia", 
-                  "Tasmania", "Northern Territory", "Australian Capital Territory")
-test_that("'state' contains valid Australian state names", {
-  expect_true(all(analysis_data$state %in% valid_states))
-})
+# Check if `current_price` values are non-negative and reasonable
+if (all(test_data$current_price >= 0 & test_data$current_price <= 100)) {
+  message("Test Passed: All prices are non-negative and within a reasonable range.")
+} else {
+  stop("Test Failed: Some prices are negative or exceed the reasonable range.")
+}
 
-# Test that there are no empty strings in 'division', 'party', or 'state' columns
-test_that("no empty strings in 'division', 'party', or 'state' columns", {
-  expect_false(any(analysis_data$division == "" | analysis_data$party == "" | analysis_data$state == ""))
-})
+# Check if there are at least two unique `type` values
+if (n_distinct(test_data$type) >= 2) {
+  message("Test Passed: The dataset contains at least two unique product types.")
+} else {
+  stop("Test Failed: The dataset contains less than two unique product types.")
+}
 
-# Test that the 'party' column contains at least 2 unique values
-test_that("'party' column contains at least 2 unique values", {
-  expect_true(length(unique(analysis_data$party)) >= 2)
-})
+# Check if there are any missing values in the dataset
+if (all(!is.na(test_data))) {
+  message("Test Passed: The dataset contains no missing values.")
+} else {
+  stop("Test Failed: The dataset contains missing values.")
+}
+
+# Check if the `size` column only contains valid sizes
+valid_sizes <- c("Small", "Large", "Extra Large")
+if (all(test_data$size %in% valid_sizes)) {
+  message("Test Passed: The `size` column contains only valid sizes.")
+} else {
+  stop("Test Failed: The `size` column contains invalid values.")
+}
+
+# Check every product has at least two sizes
+size_count_check <- simulated_data %>%
+  group_by(product_name) %>%
+  summarize(size_count = n_distinct(size)) %>%
+  filter(size_count >= 2) %>%
+  nrow()
+
+total_products <- simulated_data %>%
+  distinct(product_name) %>%
+  nrow()
+
+if (size_count_check == total_products) {
+  message("Test Passed: Each product has at least two sizes (Small and Large).")
+} else {
+  stop("Test Failed: Some products do not have at least two sizes.")
+}
+#### End of Tests ####

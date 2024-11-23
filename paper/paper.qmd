@@ -100,9 +100,12 @@ analysis_data <- read_parquet(here::here("data/02-analysis_data/loblaws_data.par
 sorted_data <- analysis_data %>%
   arrange(date)
 
+sorted_data <- sorted_data %>%
+  select(product_id, date, current_price, product_name, type, size)
+
 kable(head(sorted_data, 7), 
-      col.names = c("product_id", "date", "current_price", "price_per_unit", "product_name", "units", "type", "size"), 
-      align = c("l", "c", "c", "c", "c", "c", "c", "c")) %>%
+      col.names = c("product_id", "date", "current_price", "product_name", "type", "size"), 
+      align = c("l", "c", "c", "c", "c", "c")) %>%
 kable_styling(font_size = 7)
 ```
 
