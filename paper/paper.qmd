@@ -4,15 +4,15 @@ subtitle: "Subtitle"
 author: 
   - Chenming Zhao
 thanks: "Code and data are available at: [https://github.com/ChenmingZ2000/Loblaws-NoNameBrand-Grocery-Price-Trend-Analysis.git](https://github.com/ChenmingZ2000/Loblaws-NoNameBrand-Grocery-Price-Trend-Analysis.git).
-        We gratefully acknowledge Jacob Filipp’s groceries dataset used in this analysis. The data is available at: [https://jacobfilipp.com/hammer/](https://jacobfilipp.com/hammer/).
+        We gratefully acknowledge Jacob Filipp’s groceries dataset used in this analysis. The data is available at: [https://jacobfilipp.com/hammer/](https://jacobfilipp.com/hammer/)"
 date: today
 date-format: long
 abstract: "abstract"
 format: pdf
 number-sections: true
 bibliography: references.bib
-header-includes:
-  - \usepackage{paper/tabularray}
+#header-includes:
+#  - \usepackage{tabularray/tabularray}
 pdf-engine: lualatex
 ---
 
@@ -34,25 +34,15 @@ library(arrow)
 
 # Introduction
 
-Overview paragraph
-
-Estimand paragraph
-
-Results paragraph
-
-Why it matters paragraph
-
-Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
-
-
 # Data {#sec-data}
 
 ## Overview
 
-The product pricing data for the "No Name" brand sold by Loblaws, used in this analysis, is included in the dataset provided by [@hammer], sourced from [https://jacobfilipp.com/hammer/](https://jacobfilipp.com/hammer/). This dataset compiles detailed product information, including vendors, product names, brands, categories, and unit prices. Additionally, it includes time-series pricing records for each product, capturing timestamps of price changes, current prices, unit prices, and quantities sold. These records are periodically updated on the Hammer platform to reflect the latest pricing trends. This dataset forms the foundation for analyzing price trends, identifying unit variations, and categorizing products into specific types for further analysis. Table @tbl-productdata previews the information for the target products included in this analysis, starting from June 2024.
+The product pricing data for the "No Name" brand sold by Loblaws, used in this analysis, is included in the dataset provided by [@hammer]. This dataset compiles detailed product information, including vendors, product names, brands, categories, and unit prices. Additionally, it includes time-series pricing records for each product, capturing timestamps of price changes, current prices, unit prices, and quantities sold. These records are periodically updated on the Hammer platform to reflect the latest pricing trends. This dataset forms the foundation for analyzing price trends, identifying unit variations, and categorizing products into specific types for further analysis. Table @tbl-productdata previews the information for the target products included in this analysis, starting from June 2024.
 
-To simulate, test, analyze, and clean the polling data, the statistical programming language R was employed [@citeR]. Key libraries that supported the data analysis include `tidyverse` [@tidyverse], `readxl` [@readxl], `dplyr` [@dplyr], `arrow` [@arrow], `knitr` [@knitr], `ggplot2` [@ggplot2], `kableExtra` [@kableExtra] and `patchwork` [@patch]. Additionally, the `rstanarm` [@rstanarm] library was utilized to implement multilevel modeling for prediction purposes. Also this analysis inherits the folder structure from Professor Rohan Alexander from University of Toronto [@rohan].
+To simulate, test, analyze, and clean the polling data, the statistical programming language R was employed [@citeR]. Key libraries that supported the data analysis include `tidyverse` [@tidyverse], `dplyr` [@dplyr], `arrow` [@arrow], `knitr` [@knitr], `ggplot2` [@ggplot2], `kableExtra` [@kableExtra] and `patchwork` [@patch]. Additionally, the `rstanarm` [@rstanarm] library was utilized to implement multilevel modeling for prediction purposes. Also this analysis inherits the folder structure from Professor Rohan Alexander from University of Toronto [@rohan].
 
+## Measurement
 In the real world, pricing data for consumer goods is a dynamic reflection of market trends, regional preferences, and competitive strategies. The prices of products fluctuate based on supply chain disruptions, seasonal demand, and retail strategies, making it essential to track and analyze this information systematically. The Hammer dataset serves as a resource in understanding these trends, offering a detailed collection of product pricing data sourced from leading retailers like Loblaws, Walmart, and Metro. This dataset is embedded with complexities arising from the data collection process, competitive pricing strategies, and evolving consumer behavior.
 
 Although the data collection process for [@hammer] data is not explicitly documented, based on the emphasis on "related" content on the Project Hammer website and standard industry methods, it is highly likely that common techniques such as web scraping, API integration, and data standardization were employed. These are typical approaches used to construct structured datasets from online retail platforms. That is, retailers provide public access to their product inventories and prices through their websites, making them prime candidates for automated data extraction. For example, web scraping tools are deployed to extract product details such as names, brands, vendors, categories, unit prices, and quantities, while timestamps capture the exact moment of data retrieval to ensure time-sensitive accuracy. However, even with automated methods, the process is not without its challenges. Retailers often introduce barriers like CAPTCHA systems or dynamic content loading, which require robust solutions such as headless browsers or API integrations to ensure smooth data acquisition.
@@ -74,9 +64,9 @@ In this analysis of Loblaws' "No Name" brand products 2024, the primary outcome 
 ### Predictor Variables
 In this analysis, the predictor variables are the variables that we believe can influence the current price of products in the Loblaws grocery dataset. These variables are chosen based on their potential to explain variations in product pricing. Below are the predictor variables included in our model, along with an explanation of their significance.
 
-- `Size`: Product size is a determinant of pricing, as larger sizes generally cost more due to the increased quantity. However, pricing strategies such as bulk discounts or price-per-unit variations can create non-linear relationships between size and price, making size an important factor to analyze.
-- `Type`: Product type (e.g., snacks, seasoning, dairy) reflects category-level differences in pricing strategies. Different types of products may have varying production costs, supply chain logistics, and market demand, all of which contribute to price fluctuations.
-- `Date`: Time plays an important role in grocery pricing due to reasons like seasonal demand, inflation, supply chain disruptions, and promotions. Analyzing the impact of time allows us to capture temporal trends and shifts in pricing behavior, such as rising costs during inflationary periods or discounts during specific seasons.
+**Size**: Product size is a determinant of pricing, as larger sizes generally cost more due to the increased quantity. However, pricing strategies such as bulk discounts or price-per-unit variations can create non-linear relationships between size and price, making size an important factor to analyze.
+**Type**: Product type (e.g., snacks, seasoning, dairy) reflects category-level differences in pricing strategies. Different types of products may have varying production costs, supply chain logistics, and market demand, all of which contribute to price fluctuations.
+**Date**: Time plays an important role in grocery pricing due to reasons like seasonal demand, inflation, supply chain disruptions, and promotions. Analyzing the impact of time allows us to capture temporal trends and shifts in pricing behavior, such as rising costs during inflationary periods or discounts during specific seasons.
 
 ### Exclusions and Considerations
 Other variables (e.g., vendor or brand-specific promotions) could also influence pricing. However, in this analysis, we focus specifically on the effects of `size`, `type`, and `date`, as they represent the most consistent and accessible predictors in the dataset. Additional variables, while potentially relevant, may not be consistently available or may introduce unnecessary complexity into the model.
@@ -246,34 +236,31 @@ This model is a generalized linear mixed model (GLMM) within a Bayesian framewor
 
 $y_i \sim \text{Gamma}(\mu_i, \phi)$
 
-Define yiy_i as the current price of the product in the ii-th observation, assumed to follow a Gamma distribution with mean $\mu_i$ and shape parameter $\phi$. This model accounts for variations across different product sizes, types, and temporal trends, with random intercepts for each product ID.
+Define $y_i$ as the current price of the product in the i-th observation, assumed to follow a Gamma distribution with mean $\mu_i$ and shape parameter $\phi$. This model accounts for variations across different product sizes, types, and temporal trends, with random intercepts for each product ID.
 
 The linear predictor for the mean ($\mu_i$) of the Gamma distribution is defined as follows:
-$$
-\log(\mu_i) = \alpha + \beta_1 \cdot \text{size}_ i + \beta_2 \cdot \text{type}_i + \beta_3 \cdot \text{date}_i + u_{\text{product_id}[i]} \\
-$$
 
-where:
-$y_i$ is the observed current price for the ii-th product.
-$\mu_i$ is the predicted mean price for the ii-th product, modeled on a log scale.
-$\alpha \sim \text{Normal}(2, 5)$ is the global intercept representing the baseline price.
-$\beta_1 \sim \text{Normal}(0, 5)$ captures the effect of product size on pricing (e.g., Small, Large, Extra Large).
-$\beta_2 \sim \text{Normal}(0, 5)$ represents the effect of product type (e.g., Snacks, Flour/Rice, Cooking Oil) on pricing.
-$\beta_3 \sim \text{Normal}(0, 5)$ accounts for the temporal trend in prices over time.
-
-Random effects:
-
-$u_{\text{state}} \sim \text{Normal}(0, \sigma_{\text{state}})$
-
-$v_{\text{pollster}} \sim \text{Normal}(0, \sigma_{\text{pollster}})$
-
-$\gamma_{\text{pollster}} \sim \text{Normal}(0, \sigma_{\mathrm{pollster\_slope}})$
+$log(\mu_i)$ = $\alpha$ + $\beta_1 \cdot \text{size}_ i$ + $\beta_2 \cdot \text{type}_i$ + $\beta_3 \cdot \text{date}_i$ + $u_{\text{productID}[i]}$
 
 where:
 
-- $u_{\text{state}[i]}$ is the random intercept for each state, allowing for state-level variations in Trump support.
-- $v_{\text{pollster}[i]}$ is the random intercept for each pollster, capturing pollster-specific effects.
-- $\gamma_{\text{pollster}[i]}$ is the random slope associated with the time variable ($\mathrm{days\_since\_Biden\_Withdrawal}$) for each pollster.
+- $y_i$ is the observed current price for the i-th product.
+
+- $\mu_i$ is the predicted mean price for the i-th product, modeled on a log scale.
+
+- $\alpha \sim \text{Normal}(2, 5)$ is the global intercept representing the baseline price.
+
+- $\beta_1 \sim \text{Normal}(0, 5)$ captures the effect of product size on pricing (e.g., Small, Large, Extra Large).
+
+- $\beta_2 \sim \text{Normal}(0, 5)$ represents the effect of product type (e.g., Snacks, Flour/Rice, Cooking Oil) on pricing.
+
+- $\beta_3 \sim \text{Normal}(0, 5)$ accounts for the temporal trend in prices over time.
+
+Random Effects: $u_{\text{productID}} \sim \text{Normal}(0, \sigma_{\text{productID}})$
+
+where:
+
+$u_{\text{productID}[i]}$ is the random intercept for each product ID, capturing product-specific variations in pricing.
 
 
 ## Model justification
@@ -299,115 +286,37 @@ By modeling the interaction between size and type `(size * type)`, the model all
 
 # Results
 
-Our results are summarized in @tbl-modelresults.
+Our results are summarized in @tbl-model.
 
-```{r}
+```{r, message=FALSE}
 #| echo: false
-#| eval: true
+#| eval: false
 #| warning: false
 #| message: false
 
 library(rstanarm)
 
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
+first_model <- readRDS(file = here::here("models/price_model.rds"))
+
+
 ```
 
-```{r}
+
+```{r, message=FALSE}
 #| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| eval: false
+#| label: tbl-model
+#| tbl-cap: Model summary table for model which predicts Loblaws "No Name" grocery price in 2024
 #| warning: false
+#| message: false
 
 modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
+  list("Loblaws 'No Name' Price Gamma model" = first_model),
   statistic = "mad",
-  fmt = 2
+  fmt = 2,
+  coef_map = c("Sigma[product_id × (Intercept),(Intercept)]", "(Intercept)", "sizeLarge", "sizeSmall", "typeSnacks", "typeFlour/Rice")
 )
 ```
-
-
-
-
-# Discussion
-
-## First discussion point {#sec-first-point}
-
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
-
-## Second discussion point
-
-Please don't use these as sub-heading labels - change them to be what your point actually is.
-
-## Third discussion point
-
-## Weaknesses and next steps
-
-Weaknesses and next steps should also be included.
-
-\newpage
-
-\appendix
-
-# Appendix {-}
-
-
-# Additional data details
-
-# Model details {#sec-model-details}
-
-## Posterior predictive check
-
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
-
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
-
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
-
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
-```
-
-## Diagnostics
-
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
-
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
-
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
-
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
-```
-
-
 
 \newpage
 
