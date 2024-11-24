@@ -130,7 +130,7 @@ filtered_data <- loblaws_data %>%
 p1 <- ggplot(filtered_data, aes(x = date, y = current_price, group = product_id, color = label)) +
   geom_line(alpha = 0.7, size = 1) +
   labs(x = "Date", 
-       y = "Price of the Day", 
+       y = "Price of the Day (CAD)", 
        title = "Price Trend for Products by Date",
        subtitle = "Product randomly selected",
        color = "Product Name and Size") +
@@ -148,7 +148,7 @@ p1 <- ggplot(filtered_data, aes(x = date, y = current_price, group = product_id,
 
 p2 <- ggplot(loblaws_data, aes(x = size, y = current_price, fill = size)) +
   geom_boxplot() +
-  labs(x = "Size", y = "Price", title = "Price Distribution by Size")  +
+  labs(x = "Size", y = "Price (CAD)", title = "Price Distribution by Size")  +
   theme_minimal() +
   theme(axis.text.x = element_text(size = 5),
     axis.text.y = element_text(size = 5),
@@ -178,7 +178,7 @@ p3 <- ggplot(type_trend_data, aes(x = date, y = avg_price, color = type)) +
   geom_line(size = 0.7) +
   labs(
     x = "Date",
-    y = "Average Price",
+    y = "Average Price (CAD)",
     title = "Price Trend by Time and Product Type",
     color = "Product Type"
   ) +
@@ -205,7 +205,7 @@ p4 <- ggplot(size_trend_data, aes(x = date, y = avg_price, color = size)) +
   geom_line(size = 0.7) +
   labs(
     x = "Date",
-    y = "Average Price",
+    y = "Average Price (CAD)",
     title = "Price Trend by Time and Product Size",
     color = "Product Size"
   ) +
@@ -298,6 +298,7 @@ library(rstanarm)
 
 first_model <- readRDS(file = here::here("models/price_model.rds"))
 
+prediction_data <- read_parquet(here::here("data/02-analysis_data/predicted_prices.parquet"))
 
 ```
 
@@ -316,6 +317,117 @@ modelsummary::modelsummary(
   fmt = 2,
   coef_map = c("Sigma[product_id × (Intercept),(Intercept)]", "(Intercept)", "sizeLarge", "sizeSmall", "typeSnacks", "typeFlour/Rice")
 )
+```
+
+```{r, fig.width=8, fig.height=3}
+#| echo: false
+#| eval: true
+#| label: fig-results
+#| fig-cap: Prediction of average price for Loblaws' No Name Grocery by type and by size
+#| warning: false
+
+# Summarize data by `type` and `date`
+type_trends <- prediction_data %>%
+  group_by(date, type) %>%
+  summarize(average_price = mean(adjusted_price, na.rm = TRUE))
+
+p5 <- ggplot(type_trends, aes(x = date, y = average_price, color = type)) +
+  geom_line(size = 1) +
+  labs(
+    title = "Predicted Price Trends Over Time by Product Type",
+    x = "Date",
+    y = "Average Predicted Price (CAD)",
+    color = "Product Type"
+  ) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(size = 5),
+    axis.text.y = element_text(size = 5),
+    plot.title = element_text(size = 7, face = "bold", color = "#333333"),
+    plot.subtitle = element_text(size = 6, color = "#333333"),
+    legend.title = element_text(size = 5, color = "#333333"),
+    legend.text = element_text(size = 5, color = "#333333"),
+    legend.key.size = unit(0.5, "lines"),
+    axis.title = element_text(size = 6, color = "#333333"),
+    strip.text = element_text(size = 5)
+)
+
+# Summarize data by `size` and `date`
+size_trends <- prediction_data %>%
+  group_by(date, size) %>%
+  summarize(average_price = mean(adjusted_price, na.rm = TRUE))
+
+p6 <- ggplot(size_trends, aes(x = date, y = average_price, color = size)) +
+  geom_line(size = 1) +
+  labs(
+    title = "Predicted Price Trends Over Time by Product Size",
+    x = "Date",
+    y = "Average Predicted Price ($)",
+    color = "Product Size"
+  ) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(size = 5),
+    axis.text.y = element_text(size = 5),
+    plot.title = element_text(size = 7, face = "bold", color = "#333333"),
+    plot.subtitle = element_text(size = 6, color = "#333333"),
+    legend.title = element_text(size = 5, color = "#333333"),
+    legend.text = element_text(size = 5, color = "#333333"),
+    legend.key.size = unit(0.5, "lines"),
+    axis.title = element_text(size = 6, color = "#333333"),
+    strip.text = element_text(size = 5)
+)
+
+p5 + p6
+```
+
+
+```{r, fig.width=8, fig.height=3}
+#| echo: false
+#| eval: true
+#| label: fig-results2
+#| fig-cap: Prediction of average price for Loblaws' No Name Grocery by type and by size
+#| warning: false
+# with `product_name`, `adjusted_price`, and credible intervals (lower_ci and upper_ci)
+p7 <- ggplot(prediction_data, aes(x = size, y = adjusted_price)) +
+  geom_boxplot(aes(lower = adjusted_lower_ci, upper = adjusted_upper_ci), color = "blue", fill = "lightblue", alpha = 0.5) +
+  geom_hline(yintercept = mean(prediction_data$adjusted_price), linetype = "dashed", color = "black") +
+  labs(
+    title = "Prediction of Average Product Prices by Product Name",
+    x = "Product Name",
+    y = "Predicted Price ($)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 5),
+    plot.title = element_text(size = 7, face = "bold", color = "#333333"),
+    plot.subtitle = element_text(size = 6, color = "#333333"),
+    legend.title = element_text(size = 5, color = "#333333"),
+    legend.text = element_text(size = 5, color = "#333333"),
+    legend.key.size = unit(0.5, "lines"),
+    axis.title = element_text(size = 6, color = "#333333"),
+    strip.text = element_text(size = 5)
+)
+
+p8 <- ggplot(prediction_data, aes(x = type, y = adjusted_price)) +
+  geom_boxplot(aes(lower = adjusted_lower_ci, upper = adjusted_upper_ci), color = "blue", fill = "tomato", alpha = 0.5) +
+  geom_hline(yintercept = mean(prediction_data$predicted_price), linetype = "dashed", color = "black") +
+  labs(
+    title = "Prediction of Average Product Prices by Product Name",
+    x = "Product Name",
+    y = "Predicted Price ($)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 5),
+    plot.title = element_text(size = 7, face = "bold", color = "#333333"),
+    plot.subtitle = element_text(size = 6, color = "#333333"),
+    legend.title = element_text(size = 5, color = "#333333"),
+    legend.text = element_text(size = 5, color = "#333333"),
+    legend.key.size = unit(0.5, "lines"),
+    axis.title = element_text(size = 6, color = "#333333"),
+    strip.text = element_text(size = 5)
+)
+
+p7 + p8
 ```
 
 \appendix
