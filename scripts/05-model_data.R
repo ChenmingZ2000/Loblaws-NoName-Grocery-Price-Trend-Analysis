@@ -46,6 +46,8 @@ price_model <- stan_glmer(
   cores = 4
 )
 
+summary(price_model)
+
 #### Save model ####
 saveRDS(
   price_model,

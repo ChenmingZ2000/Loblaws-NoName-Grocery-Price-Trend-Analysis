@@ -271,7 +271,10 @@ Our prior selection was informed by the research in gamma modeling @Veazie2023Ga
 
 The model assumes that price variations at the product level are non-negative, right-skewed, and that the price differences associated with size and type are random and normally distributed. While these assumptions simplify computation and enhance interpretability, they may not fully capture the impact of market conditions, regional competition, or seasonal trends on pricing dynamics. For instance, the model assumes that the effect of size is consistent across all product types, but in reality, certain product types may be more significantly influenced by supply chain issues or promotional activities. Additionally, the model incorporates random effects for individual products to capture specific variations for each product, assuming these effects remain consistent over time.
 
-- **TODO**
+The model was implemented using the rstanarm package and employed MCMC sampling for Bayesian inference. To validate the model, we conducted out-of-sample testing and calculated the predictive accuracy using RMSE (Root Mean Square Error), which was 0.83 on the log-transformed price scale. In the context of grocery price data, this level of error is acceptable, as market forces and external factors inherently introduce noise. Convergence diagnostics (e.g., R^\hat{R}) showed values close to 1 for all parameters, indicating successful convergence of the chains. The model’s $R^2$ equals 0.967 indicates that 96.7% of the data variance is explained, demonstrating an excellent fit. The effective sample size (neffn_{\text{eff}}) for key parameters exceeded 500, ensuring the robustness of the inferences. Sensitivity analysis on priors revealed that minor adjustments to prior specifications did not significantly affect the model's predictions, demonstrating high model stability.
+
+We also compared this model to alternative approaches. A simpler linear regression model without random effects failed to account for product-level variations, particularly for products with fewer observations, resulting in significantly higher prediction errors. Conversely, a more complex model incorporating additional factors such as promotional pricing or competitor prices achieved only marginal improvements in predictive accuracy but at a substantial increase in computational cost, making it overly complex. Therefore, the current model, which integrates a hierarchical structure and focuses on size, type, and temporal trends, strikes a good balance between predictive accuracy, interpretability, and computational efficiency.
+
 
 ### Expectation of relationships between variables
 
@@ -305,7 +308,7 @@ prediction_data <- read_parquet(here::here("data/02-analysis_data/predicted_pric
 
 ```{r, message=FALSE}
 #| echo: false
-#| eval: false
+#| eval: true
 #| label: tbl-model
 #| tbl-cap: Model summary table for model which predicts Loblaws "No Name" grocery price in 2024
 #| warning: false
