@@ -1,0 +1,6 @@
+"0","#| echo: false"
+"0","#| eval: true"
+"0","#| warning: false"
+"0","#| message: false"
+"0",""
+"0","analysis_data <- read_parquet(here::here(""data/02-analysis_data/loblaws_data.parquet""))"

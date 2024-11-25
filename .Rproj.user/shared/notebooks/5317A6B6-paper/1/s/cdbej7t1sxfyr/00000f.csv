@@ -1,0 +1,7 @@
+"0","#| echo: false"
+"0","#| eval: true"
+"0","#| label: fig-post4"
+"0","#| fig-cap: posterior distributions of four parameters in model"
+"0","#| warning: false"
+"0",""
+"0","plot(first_model, ""areas"", pars = c(""(Intercept)"", ""sizeLarge"", ""sizeSmall"", ""typeSnacks"", ""typeFlour/Rice"", ""typeSeasoning""))"

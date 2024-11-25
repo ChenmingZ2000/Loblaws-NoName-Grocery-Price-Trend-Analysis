@@ -1,0 +1,26 @@
+{
+    "id": "D27F79EF",
+    "path": "/cloud/project/paper/paper.qmd",
+    "project_path": "paper/paper.qmd",
+    "type": "quarto_markdown",
+    "hash": "96886836",
+    "contents": "",
+    "dirty": false,
+    "created": 1732344627518.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "15,20",
+        "scrollLine": "0"
+    },
+    "folds": "77|21|84|0|\n86|6|101|0|\n116|63|164|0|\n166|65|224|0|\n294|21|306|0|\n327|33|385|0|\n387|33|435|0|\n451|33|460|0|\n466|33|475|0|\n478|33|486|0|\n494|33|502|0|\n",
+    "lastKnownWriteTime": 1732492273,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1732492273579,
+    "read_only": false,
+    "read_only_alternatives": []
+}

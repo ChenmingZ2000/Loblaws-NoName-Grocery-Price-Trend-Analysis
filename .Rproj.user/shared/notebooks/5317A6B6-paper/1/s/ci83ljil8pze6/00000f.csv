@@ -1,0 +1,8 @@
+"0","#| echo: false"
+"0","#| eval: true"
+"0","#| label: fig-post2"
+"0","#| fig-cap: MCMC sampling trace plots for model"
+"0","#| warning: false"
+"0",""
+"0",""
+"0","plot(first_model, ""trace"", pars = c(""(Intercept)"", ""sizeLarge"", ""sizeSmall"", ""typeSnacks"", ""typeFlour/Rice"", ""typeSeasoning""))"

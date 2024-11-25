@@ -1,0 +1,26 @@
+{
+    "id": "F6991678",
+    "path": "/cloud/project/scripts/06-prediction_data.R",
+    "project_path": "scripts/06-prediction_data.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1732368871817.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "32,1",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1732472421,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1732472421642,
+    "read_only": false,
+    "read_only_alternatives": []
+}

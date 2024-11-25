@@ -11,6 +11,8 @@ abstract: "abstract"
 format: pdf
 number-sections: true
 bibliography: references.bib
+header-includes:
+  - \usepackage{paper/tabularray}
 pdf-engine: lualatex
 ---
 
