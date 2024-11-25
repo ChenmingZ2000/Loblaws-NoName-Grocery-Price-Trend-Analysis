@@ -304,12 +304,9 @@ prediction_data <- read_parquet(here::here("data/02-analysis_data/predicted_pric
 
 ```
 
-## Prediction Output
-
-
 ```{r, message=FALSE}
 #| echo: false
-#| eval: true
+#| eval: false
 #| label: tbl-model
 #| tbl-cap: Model summary table for model which predicts Loblaws "No Name" grocery price in 2024
 #| warning: false
@@ -323,11 +320,19 @@ modelsummary::modelsummary(
 )
 ```
 
+## Prediction Output
+
+Our analysis aims to predict the price trends of Loblaws' "No Name" products from November 20, 2024, to February 2025. The results of our model are illustrated in @fig-results1 and @fig-results2. @fig-results1 presents the predicted trends categorized by product type and size, providing a comparison across different products. The model predicts overall moderate price stability, with some variation between product types and sizes. @fig-results2 shows the prediction distribution categorized by product size.
+
+At the product category level, the left panel of @fig-results1 shows that the price of Snacks remains relatively stable, while the other four categories exhibit comparatively larger fluctuations. These trends align with historical data. However, compared to historical data, the model underestimates the price volatility in certain categories. For instance, the historical data shows significant short-term price fluctuations in Seasoning, which are not fully reflected in the predicted results.
+
+For product size, the right panel of @fig-results1 and @fig-results2 both indicate clear price stratification among Small, Large, and Extra Large products, with larger-sized products having higher average prices. The model successfully replicates a reasonable stratification structure, but the predicted price range is narrower, and the price volatility is lower compared to the historical observations.
+
 ```{r, fig.width=8, fig.height=3}
 #| echo: false
 #| eval: true
-#| label: fig-results
-#| fig-cap: Prediction of average price for Loblaws' No Name Grocery by type and by size
+#| label: fig-results1
+#| fig-cap: Prediction of average price trend for Loblaws' No Name Grocery by type and by size
 #| warning: false
 
 # Summarize data by `type` and `date`
@@ -383,15 +388,16 @@ p6 <- ggplot(size_trends, aes(x = date, y = average_price, color = size)) +
 p5 + p6
 ```
 
-```{r, fig.width=8, fig.height=3}
+```{r, fig.width=5, fig.height=3}
 #| echo: false
 #| eval: true
 #| label: fig-results2
-#| fig-cap: Prediction of average price for Loblaws' No Name Grocery by type and by size
+#| fig-cap: Prediction of average price distribution for Loblaws' No Name Grocery by size
 #| warning: false
+
 # with `product_name`, `adjusted_price`, and credible intervals (lower_ci and upper_ci)
-p7 <- ggplot(prediction_data, aes(x = size, y = adjusted_price)) +
-  geom_boxplot(aes(lower = adjusted_lower_ci, upper = adjusted_upper_ci), color = "blue", fill = "lightblue", alpha = 0.5) +
+ggplot(prediction_data, aes(x = size, y = adjusted_price)) +
+  geom_boxplot(aes(lower = adjusted_lower_ci, upper = adjusted_upper_ci), color = "blue", fill = "tomato", alpha = 0.5) +
   geom_hline(yintercept = mean(prediction_data$adjusted_price), linetype = "dashed", color = "black") +
   labs(
     title = "Prediction of Average Product Prices by Product Name",
@@ -410,27 +416,6 @@ p7 <- ggplot(prediction_data, aes(x = size, y = adjusted_price)) +
     strip.text = element_text(size = 5)
 )
 
-p8 <- ggplot(prediction_data, aes(x = type, y = adjusted_price)) +
-  geom_boxplot(aes(lower = adjusted_lower_ci, upper = adjusted_upper_ci), color = "blue", fill = "tomato", alpha = 0.5) +
-  geom_hline(yintercept = mean(prediction_data$predicted_price), linetype = "dashed", color = "black") +
-  labs(
-    title = "Prediction of Average Product Prices by Product Name",
-    x = "Product Name",
-    y = "Predicted Price ($)"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-    axis.text.y = element_text(size = 5),
-    plot.title = element_text(size = 7, face = "bold", color = "#333333"),
-    plot.subtitle = element_text(size = 6, color = "#333333"),
-    legend.title = element_text(size = 5, color = "#333333"),
-    legend.text = element_text(size = 5, color = "#333333"),
-    legend.key.size = unit(0.5, "lines"),
-    axis.title = element_text(size = 6, color = "#333333"),
-    strip.text = element_text(size = 5)
-)
-
-p7 + p8
 ```
 
 \appendix
