@@ -1,4 +1,4 @@
-# Prediction of the 2025 January Loblaws' No Name Groceries Price
+# Prediction of the 2025 January Loblaws' No Name Groceries Price Strategy
 
 ## Overview
 
