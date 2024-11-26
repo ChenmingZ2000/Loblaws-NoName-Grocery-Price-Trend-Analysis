@@ -3,7 +3,7 @@
     "path": "/cloud/project/paper/paper.qmd",
     "project_path": "paper/paper.qmd",
     "type": "quarto_markdown",
-    "hash": "3339680215",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1732493050397.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "277,23",
-        "scrollLine": "268"
+        "cursorPosition": "9,20",
+        "scrollLine": "1"
     },
-    "folds": "71|21|78|0|\n80|6|95|0|\n107|63|155|0|\n157|65|215|0|\n282|21|294|0|\n296|21|310|0|\n320|33|378|0|\n380|33|408|0|\n",
-    "lastKnownWriteTime": 1732598782,
+    "folds": "71|21|78|0|\n80|6|95|0|\n107|63|155|0|\n157|65|215|0|\n282|21|294|0|\n296|21|310|0|\n320|33|378|0|\n380|33|408|0|\n462|33|471|0|\n477|33|486|0|\n489|33|497|0|\n505|33|513|0|\n",
+    "lastKnownWriteTime": 1732617161,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1732598782063,
+    "last_content_update": 1732617162001,
     "read_only": false,
     "read_only_alternatives": []
 }
