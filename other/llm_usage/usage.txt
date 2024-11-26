@@ -223,4 +223,21 @@ bibtex
   note         = {Accessed: 2024-11-24}
 }
 As with the earlier example, make sure to adjust the Accessed date to reflect the actual date you accessed the article.
+
+User
+cite https://www.thetimes.com/world/us-world/article/outraged-canadians-boycott-chain-charging-40-for-five-chicken-breasts-gbj5txn0b in .bib
+
+ChatGPT
+Here is the BibTeX entry for the article you referenced:
+
+@article{mcdonald-gibson_outraged_2024,
+  author = {Charlotte McDonald-Gibson},
+  title = {Outraged Canadians Boycott Chain Charging \$40 for Five Chicken Breasts},
+  journal = {The Times},
+  year = {2024},
+  month = {June},
+  day = {7},
+  url = {https://www.thetimes.com/world/us-world/article/outraged-canadians-boycott-chain-charging-40-for-five-chicken-breasts-gbj5txn0b}
+}
+This entry includes the author's name, article title, publication name, date, and URL.
   
