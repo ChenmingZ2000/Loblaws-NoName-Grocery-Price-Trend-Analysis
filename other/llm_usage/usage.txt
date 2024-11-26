@@ -240,4 +240,49 @@ Here is the BibTeX entry for the article you referenced:
   url = {https://www.thetimes.com/world/us-world/article/outraged-canadians-boycott-chain-charging-40-for-five-chicken-breasts-gbj5txn0b}
 }
 This entry includes the author's name, article title, publication name, date, and URL.
+
+User
+cite https://www.bankofcanada.ca/2024/07/what-drives-up-the-price-of-groceries in .bib
+
+ChatGPT
+Here’s the citation in BibTeX format:
+
+@misc{bankofcanada2024groceries,
+  author       = {Bank of Canada},
+  title        = {What Drives Up the Price of Groceries?},
+  year         = {2024},
+  month        = {July},
+  url          = {https://www.bankofcanada.ca/2024/07/what-drives-up-the-price-of-groceries},
+  note         = {Accessed: 2024-11-26}
+}
+
+User
+cite https://www150.statcan.gc.ca/n1/pub/62f0014m/62f0014m2022014-eng.htm in .bib
+
+ChatGPT
+Here’s the citation in BibTeX format:
+
+@misc{statcan2022foodprices,
+  author       = {Statistics Canada},
+  title        = {Monthly average retail prices for selected products, January 2022},
+  year         = {2022},
+  month        = {January},
+  url          = {https://www150.statcan.gc.ca/n1/pub/62f0014m/62f0014m2022014-eng.htm},
+  note         = {Accessed: 2024-11-26}
+}
+
+User
+cite https://www.cbc.ca/news/canada/toronto/food-bank-toronto-record-1.7380521 in .bib
+
+ChatGPT
+Here’s the citation in BibTeX format:
+
+@misc{cbc2024foodbank,
+  author       = {CBC News},
+  title        = {Food Bank Visits in Toronto Hit Record High},
+  year         = {2024},
+  month        = {April},
+  url          = {https://www.cbc.ca/news/canada/toronto/food-bank-toronto-record-1.7380521},
+  note         = {Accessed: 2024-11-26}
+}
   

@@ -1,13 +1,13 @@
 ---
-title: "Title"
-subtitle: "Subtitle"
+title: "Does the Price Stability of 'No Name' Mean No Price Increases? A Strategy by Loblaws to Retain Customers"
+subtitle: "Price Changes of Private-Label Brands: Stability, Strategy, and Consumer Impact"
 author: 
   - Chenming Zhao
 thanks: "Code and data are available at: [https://github.com/ChenmingZ2000/Loblaws-NoName-Grocery-Price-Trend-Analysis.git](https://github.com/ChenmingZ2000/Loblaws-NoName-Grocery-Price-Trend-Analysis.git).
         We gratefully acknowledge Jacob Filipp’s groceries dataset used in this analysis. The data is available at: [https://jacobfilipp.com/hammer/](https://jacobfilipp.com/hammer/)"
 date: today
 date-format: long
-abstract: "abstract"
+abstract: "This paper examines the pricing dynamics of Loblaws' private-label brand, No Name, in the context of rising grocery prices and consumer dissatisfaction in Canada. Using a hierarchical Bayesian model, we analyzed price fluctuations of No Name products across multiple categories to identify trends and potential strategies employed by Loblaws. Our findings shows that while prices exhibit minor fluctuations, No Name products have largely remained stable, suggesting a deliberate strategy by Loblaws to retain customers amidst growing competition and economic pressures. This study highlights the role of private-label brands in maintaining consumer loyalty and offers ideas about how large retailers balance affordability and profitability in an inflationary environment."
 format: pdf
 number-sections: true
 bibliography: references.bib
@@ -31,6 +31,15 @@ library(arrow)
 
 
 # Introduction
+
+The Bank of Canada has noted that, since the economy began recovering from the pandemic, Canadians have experienced high inflation across many goods and services, with food prices rising faster than most other categories. Several factors have contributed to the surge in food costs, including supply chain disruptions, labor shortages, adverse weather conditions, and geopolitical events [see more details in @bankofcanada2024groceries and @statcan2022foodprices]. For example, in September 2022, annual food price inflation at grocery stores reached 11.4%, the fastest pace since 1981. In Toronto, food bank visits also set a new record, with 3.49 million visits recorded between April 2023 and April 2024, marking a significant increase from the previous year. This trend highlights the growing difficulty residents face in coping with the rising cost of living [see more details in @cbc2024foodbank].
+
+Among Canada’s major grocery vendors, Loblaw Companies Limited has been at the center of widespread discussions and dissatisfaction due to price increases. As reported in @cbc2024people consumers have expressed frustration with the continued rise in food prices, particularly as inflation has begun to slow, raising questions about the pricing power of large grocery chains. Furthermore, Loblaw and its parent company, George Weston Limited, agreed to pay CAD 500 million to settle a class-action lawsuit related to bread price-fixing allegations, further exacerbating public dissatisfaction with the company's pricing strategies [see more details in @cbc2024].
+
+The estimand of this study is the price fluctuations of grocery items under Loblaw’s private-label brand, No Name. As one of Canada’s largest grocery retailers, Loblaw’s No Name brand has a high level of market coverage and consumer recognition nationwide. Positioned as an affordable, high-value brand, No Name aligns closely with the needs of consumers facing inflation and rising food prices. It also serves as a key tool for Loblaw to increase customer retention. By studying No Name's pricing and market behavior, we aim to infer Loblaw’s overall pricing strategies.
+Our analysis indicates that while most No Name products exhibit price fluctuations, their prices have remained relatively stable without significant increases. This suggests that Loblaw is likely maintaining control over No Name prices and using the PC Optimum loyalty program to prevent customer attrition.
+
+The remainder of this paper is structured as follows. @sec-data introduces the data sources, preprocessing steps, variable selection criteria, and potential relationships between independent and dependent variables. @sec-model provides a concise explanation of the hierarchical Bayesian model, including the design rationale and the selection of priors and random effects, with more details on the model’s posterior in [Appendix -@sec-model-details]. @sec-result presents the main findings of the study, including a summary of the model output to support its accuracy and predictions of grocery price trends by different categories of “No Name” products through February 15, 2025. Finally, @sec-discussion includes the implications of the results, limitations of the data, complexities of incorporating real-world factors into the dataset, potential future pricing strategies by Loblaw, and steps for further research.
 
 # Data {#sec-data}
 
@@ -157,7 +166,7 @@ p1 + p2
 
 ```{r, message=FALSE, warning=FALSE, fig.width= 7, fig.height= 3}
 #| label: fig-2
-#| fig-cap: Average Support Rate  for Donald Trump from 2024-07-21 to 2024-10-23 reported by different pollsters
+#| fig-cap: Average Price Trend for Loblaws "No Name" Groceries Over Time Categorized in Type (left) and in Size (right).
 #| echo: false
 # Group data by date and product type, and calculate average price for each type per date
 type_trend_data <- loblaws_data %>%
@@ -276,7 +285,9 @@ To account for variations among individual products, we introduced a random inte
 By modeling the interaction between size and type `(size * type)`, the model allows for a more detailed understanding of relationships, such as pricing differences for "Extra Large" products between "Cooking Oil" and "Milk." This interaction term helps identify combined effects that cannot be fully explained by individual variables. Together, these variables enable the model to capture the dynamic pricing structure of Loblaws "No Name" products, reflecting time trends and structural differences across product categories and sizes.
 
 # Results {#sec-result}
+
 ## Model Output
+
 Our model results are summarized in @tbl-model. This summary shows the effects of product attributes, including size and type, on price predictions. For instance, products categorized as "Large" are associated with a price reduction of 0.47 CAD compared to the baseline (Extra Large), while "Small" products show an even larger reduction of 0.98 CAD. Similarly, "Snacks" exhibit a negative effect of 0.39 CAD on price compared to the baseline type (Cooking Oil), while "Flour/Rice" shows a negligible effect. 
 The model achieves an $R^2$ value of 0.967, indicating that it explains 96.7% of the variation in the data. This shows that the model effectively captures the main patterns in the data. The marginal $R^2$, which excludes the random effects, is 0.742, suggesting that fixed effects alone explain a substantial portion of the variance. The Intraclass Correlation Coefficient (ICC) is 0.1, indicating that only 10% of the variability is attributable to clustering by `product_id`, suggesting relatively low within-group correlation. Additional metrics support the model's robustness. The WAIC (6585.0) and LOOIC (6585.1) values confirm that the model balances predictive accuracy with generalizability, avoiding overfitting.
 
@@ -296,7 +307,7 @@ prediction_data <- read_parquet(here::here("data/02-analysis_data/predicted_pric
 
 ```{r, message=FALSE}
 #| echo: false
-#| eval: false
+#| eval: true
 #| label: tbl-model
 #| tbl-cap: Model summary table for model which predicts Loblaws "No Name" grocery price in 2024
 #| warning: false
@@ -450,12 +461,37 @@ However, based on the report by @mcdonald-gibson_outraged_2024, Loblaws’ polic
 
 # Appendix {-}
 
-# Model details {#sec-data-details}
+# Data Collection Methodology Overview and Evaluation {#sec-data-details}
+
+Observational data forms the core of our models; however, unlike experimental data, it is inherently limited by sampling biases, incomplete data, misclassification or duplicate classification of products, and inconsistent cross-product size standardization. Imagine you are assembling a complex machine, where each component must fit perfectly to deliver precision and efficiency. This is precisely how the Hammer Project operates—piecing together grocery pricing data to construct a unified picture of competition and pricing behaviors in Canada’s grocery market. In this section, we explore the foundation of Hammer Project’s data collection and analysis methodologies.
+
+## Data Sources and Collection
+The [Hammer Project](https://jacobfilipp.com/hammer/) collects its data through web scraping, capturing pricing information directly from the user interfaces of major grocery retailers’ websites without using APIs. Prices are specifically for the "in-store pickup" option and are based on a neighborhood in Toronto. The dataset includes eight vendors: Voila, T&T, Loblaws, No Frills, Metro, Galleria, Walmart Canada, and Save-On-Foods.
+
+However, relying on web scraping instead of APIs comes with limitations. APIs often provide more accurate and reliable historical price data, while web scraping can only capture data currently displayed on the website. For example, if a product is removed from the webpage after selling out rather than being marked as "out of stock," it may not be captured. Changes in website structure or server interruptions can also lead to inconsistencies, requiring researchers to perform additional data cleaning and supplementation. Furthermore, focusing solely on "in-store pickup" prices, without considering delivery or other purchasing methods, might fail to accurately reflect overall pricing strategies or market behaviors of grocers. This limitation narrows the dataset’s applicability. Additionally, collecting data from a single geographic area may restrict the generalizability of findings to other regions of Canada.
+
+To ensure comprehensive coverage of grocery price trends, the dataset expanded its scope after the initial phase. Early data collection (from February 28 to July 10/11) focused on a small subset of products, but a broader variety of products was included starting July 10/11. This later expansion better reflects the diversity of products and pricing behaviors across vendors.
+However, this sudden introduction of new data after July 10/11 poses challenges for analyzing price trends over time. It could create disruptions within categories, impacting the consistency of earlier patterns. Since the February to July period constitutes a significant portion of the current dataset (as of November 2024), researchers cannot exclude this period entirely to eliminate disturbances.
+
+## Data Cleaning and Integration
+@hammer processes its data into two core tables: a product table containing metadata and a raw table with time-series price data. These tables are joined using unique product identifiers. Challenges include managing duplicate entries for the same product and distinguishing between similar items. As noted on the Hammer Project website, a single product might appear multiple times under different categories, or subtle branding differences might complicate matching. Addressing these issues requires future data cleaning. However, since the data cannot be revisited retrospectively to correct inaccuracies from the time of collection, these challenges make ensuring complete data reliability more difficult.
+
+Additionally, the Hammer Project dataset encourages users to explore targeted research questions. Examples include:
+
+- `How do prices for common grocery bundles (e.g., eggs, milk, and bread) change over time and across vendors?`
+
+- `Are "sales" genuine discounts, or do they follow price hikes?`
+
+- `Which vendors consistently offer the lowest prices across comparable products?`
+
+These questions align with the structured approach seen in polling methodology, where clear and purposeful design guides analysis. The transparency and flexibility of the dataset support academic and legal research, fostering a deeper understanding of Canada’s grocery industry.
+
+# Model details {#sec-model-details}
 R package `bayesplot` [@bayesplot] is used for posteriors.
 
-Due to space limitations, we have chosen to display only the posterior and prior comparisons for a subset of variables in the posterior analysis. If we were to display all variables included in the model, the chart would become overly complex and difficult to interpret. Although the effects of multiple variables differ, focusing on this subset may give the impression that the model’s sensitivity to variations across different factors is limited. Thus, we have selected representative variables, including the intercept, size categories ("sizeLarge" and "sizeSmall"), and product types ("typeSnacks," "typeFlour/Rice," and "typeSeasoning"). The output results for other variables not shown are generally consistent with the trends observed here. Additionally, in regression models (such as stan_glmer), categorical variables (factors) are typically automatically converted into dummy variables. One category is set as the reference category (baseline), and its effect is included in the intercept, while the coefficients for other categories represent their offsets relative to the baseline. For example, in our model, if `Extra Large` is set as the baseline (default), it will not appear as a separate coefficient. The coefficients for `sizeLarge` and `sizeSmall` would then represent their deviations relative to `Extra Large`.
+Due to space limitations, we have chosen to display only the posterior and prior comparisons for a subset of variables in the posterior analysis. If we were to display all variables included in the model, the chart would become overly complex and difficult to interpret. Although the effects of multiple variables differ, focusing on this subset may give the impression that the model’s sensitivity to variations across different factors is limited. Thus, we have selected representative variables, including the intercept, size categories (`sizeLarge` and `sizeSmall`), and product types (`typeSnacks`, `typeFlour/Rice`, and `typeSeasoning`). The output results for other variables not shown are generally consistent with the trends observed here. Additionally, in regression models (such as stan_glmer), categorical variables are typically automatically converted into dummy variables. One category is set as the reference category (baseline), and its effect is included in the intercept, while the coefficients for other categories represent their offsets relative to the baseline. For example, in our model, if `Extra Large` is set as the baseline (default), it will not appear as a separate coefficient. The coefficients for `sizeLarge` and `sizeSmall` would then represent their deviations relative to `Extra Large`.
 
-# Posterior predictive check {#sec-model-details}
+## Posterior predictive check
 @fig-post1 displays a comparison between the distribution of observed data $y$ and the distribution of simulated data $y_{rep}$ generated by our model. The dark solid line represents the observed data's actual distribution, while the multiple light lines correspond to distributions from various simulated datasets. If the distribution of simulated data $y_{rep}$ closely resembles that of the observed data $y$, it suggests that the model effectively captures the underlying characteristics of the observed data.
 
 In @fig-post1, we observe that the simulated data distributions (light lines) align closely with the real data distribution (dark line) across the entire range, particularly at the peaks and troughs of the observed data. This indicates that the model has captured the distributional features of the observed data, including its skewness and multimodal structure. The ability to replicate these features demonstrates the model's strong predictive capacity and its reliability in estimating posterior distributions. This result builds confidence in the model's suitability for further inference and prediction.
